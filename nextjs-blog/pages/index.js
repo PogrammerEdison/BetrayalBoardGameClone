@@ -6,11 +6,7 @@ import io from "socket.io-client";
 
 <link rel="stylesheet" href="globals.css"></link>;
 
-// const socket = io.connect("http://localhost:3001", {
-//   reconnection: true,
-//   reconnectionAttempts: Infinity,
-//   forceNewConnection: false,
-// });
+const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
 
 ////////////
 
@@ -18,12 +14,12 @@ import io from "socket.io-client";
 
 function HomePage(props) {
 
-  const [Socket, setSocket] = SocketStore();
+
   const [playerList, setPlayerList] = PlayerListStore();
   const router = useRouter();
 
   function startRoom() {
-    Socket.emit("startRoom", {
+    socket.emit("startRoom", {
       hostName: document.getElementById("name").value,
       roomID: String(Math.floor(Math.random() * 1000)),
     });
