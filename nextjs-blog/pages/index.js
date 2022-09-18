@@ -6,7 +6,7 @@ import io from "socket.io-client";
 
 <link rel="stylesheet" href="globals.css"></link>;
 
-const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
+const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 
 ////////////
 
