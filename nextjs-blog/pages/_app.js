@@ -8,6 +8,7 @@ import { ItemStoreProvider } from "../context/ItemStore.js";
 import { ActiveCellStoreProvider } from "../context/ActiveCellStore.js";
 import { TestStoreProvider } from "../context/TestStore.js";
 import { PlayerListStoreProvider } from "../context/PlayerListStore.js";
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
