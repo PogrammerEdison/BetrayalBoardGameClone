@@ -2,6 +2,7 @@ import { PlayerListStore } from "../context/PlayerListStore";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
+import io from "socket.io-client";
 
 
 const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
