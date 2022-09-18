@@ -16,7 +16,7 @@ const Store = createContext();
 export const SocketStore = () => useContext(Store);
 
 export const SocketStoreProvider = ({ children }) => {
-  //const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
+  const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
   const [Socket, setSocket] = useRef(0);
 
   return (
