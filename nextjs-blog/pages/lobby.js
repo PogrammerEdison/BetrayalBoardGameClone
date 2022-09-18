@@ -161,7 +161,7 @@ function RoomPage(props) {
   return (
     <div>
       <div style={{ position: "absolute", left: "49%", top: "5%" }}>
-        Lobby, socket id: {Socket.id}
+        Lobby, socket id: {socket.id}
       </div>
       <div style={{ position: "absolute", left: "49%", top: "10%" }}>
         Lobby code: {roomCode}
