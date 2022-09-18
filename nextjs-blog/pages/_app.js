@@ -5,7 +5,23 @@ function MyApp({ Component, pageProps }) {
   return (
     <SocketStoreProvider>
       <PlayerListStoreProvider>
-        <Component {...pageProps} />
+        <TestStoreProvider>
+          <ActiveCellStoreProvider>
+            <ItemStoreProvider>
+              <CardTriggerProvider>
+                <CardStackStoreProvider>
+                  <PlayerDetailsStoreProvider>
+                    <EventStoreProvider>
+                      <EventCardStoreProvider>
+                        <Component {...pageProps} />
+                      </EventCardStoreProvider>
+                    </EventStoreProvider>
+                  </PlayerDetailsStoreProvider>
+                </CardStackStoreProvider>
+              </CardTriggerProvider>
+            </ItemStoreProvider>
+          </ActiveCellStoreProvider>
+        </TestStoreProvider>
       </PlayerListStoreProvider>
     </SocketStoreProvider>
   );

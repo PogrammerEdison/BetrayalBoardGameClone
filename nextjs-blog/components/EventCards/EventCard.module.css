@@ -1,0 +1,54 @@
+.fp_container{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: #f8f8f8f8;
+}
+
+.cardInfo {
+  top: 25%;
+  left:35%;
+  z-index: 1000;
+  width: 30%;
+  height: 55%;
+  position: absolute;
+  background: #0026fff8;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  object-fit: fill;
+}
+
+
+.actionButton {
+  top: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.itemStack {
+  position: fixed;
+  left: 6% ;
+  top: 140px ;
+}
+
+@media (max-width: 576px) {
+  .fp_container .fp_loader .itemStack{
+    top: 30%;
+    left: 20%;
+  }
+}
+
+.cardInfoBus{
+  top: 25%;
+  left:5%;
+  z-index: 1000;
+  width: 30%;
+  height: 55%;
+  position: absolute;
+}
