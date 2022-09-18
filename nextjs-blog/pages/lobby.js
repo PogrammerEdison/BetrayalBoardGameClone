@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import io from "socket.io-client";
-
+import classes from "./chatBox.module.css";
 
 const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 // const socket = io.connect("http://localhost:3001", {
@@ -13,7 +13,6 @@ const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 //////////
 
 function RoomPage(props) {
-
   const testList = useRef([]);
   const router = useRouter();
   const [playerList, setPlayerList] = PlayerListStore();
@@ -120,43 +119,44 @@ function RoomPage(props) {
 
   let messageContainer = null;
 
-    function appendMessage(message){
-      const messageElement = document.createElement('div')
-      messageElement.innerText = message
-      console.log(messageContainer)
-      messageContainer.append(messageElement)
-    }
+  function appendMessage(message) {
+    const messageElement = document.createElement("div");
+    messageElement.innerText = message;
+    console.log(messageContainer);
+    messageContainer.append(messageElement);
+  }
 
-    useEffect (() => {
-      socket.on("chat-message", (data) => {
-        console.log("hello, chat-message recieved")
-        appendMessage(data)
-      })
-    }, [socket])
+  useEffect(() => {
+    socket.on("chat-message", (data) => {
+      console.log("hello, chat-message recieved");
+      appendMessage(data);
+    });
+  }, [socket]);
 
-    useEffect (() => {
-      socket.on("userConnected", (data) => {
-        appendMessage(data.name + " joined.")
-      })
-    }, [socket])
+  useEffect(() => {
+    socket.on("userConnected", (data) => {
+      appendMessage(data.name + " joined.");
+    });
+  }, [socket]);
 
-    useEffect(() => {
-      console.log("chat initalized")
-      const messageForm = document.getElementById("send-container");
-      const messageInput = document.getElementById("message-input");
-      messageContainer = document.getElementById("message-container");
-  
-      messageForm.addEventListener("submit", e => {
-        e.preventDefault()
-        const message = messageInput.value
-        socket.emit("sendChatMessage", {
-          message: message,
-          roomID: roomCode,
-          name: router.query.name,
-        })
-        appendMessage("You: " + message)
-        messageInput.value = ""
-      })}, []);
+  useEffect(() => {
+    console.log("chat initalized");
+    const messageForm = document.getElementById("send-container");
+    const messageInput = document.getElementById("message-input");
+    messageContainer = document.getElementById("message-container");
+
+    messageForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const message = messageInput.value;
+      socket.emit("sendChatMessage", {
+        message: message,
+        roomID: roomCode,
+        name: router.query.name,
+      });
+      appendMessage("You: " + message);
+      messageInput.value = "";
+    });
+  }, []);
 
   return (
     <div>
@@ -174,15 +174,34 @@ function RoomPage(props) {
           })}
         </ul>
       </div>
-      <div style={{ position: "absolute", left: "70%", top: "50%" }}>
-        <div id="message-container"></div>
-        <form id="send-container">
-          <input type="text" id="message-input"></input>
-          <button type="submit" id="send-button">
-            Send
-          </button>
-        </form>
+      <div
+        style={{
+          position: "absolute",
+          left: "70%",
+          top: "20%",
+          border: "solid",
+          height: "100px",
+          overflow: "auto",
+          width: "300px",
+          height: "400px",
+          borderRadius: "25px",
+          padding: "10px",
+          backgroundImage: "linear-gradient(red, yellow)",
+        }}
+      >
+        <div style={{ overflow: "visible" }}>
+          <div id="message-container" style={{ overflow: "visible" }}></div>
+        </div>
       </div>
+      <form
+        id="send-container"
+        style={{ position: "absolute", left: "71%", top: "83%", width: "300px" }}
+      >
+        <input type="text" id="message-input" style={{width: "80%"}}></input>
+        <button type="submit" id="send-button" style={{position: "relative", left:"0%", top: "0%"}}>
+          Send
+        </button>
+      </form>
       <button
         onClick={startGame}
         style={{ position: "absolute", left: "49%", top: "50%" }}
@@ -191,7 +210,6 @@ function RoomPage(props) {
       </button>
     </div>
   );
-  
 }
 
 export default RoomPage;
