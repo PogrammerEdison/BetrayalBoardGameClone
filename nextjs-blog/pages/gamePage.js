@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Game from "../components/Game";
+//import Game from "../components/Game";
 import { useRouter } from "next/router";
 
 
