@@ -2,17 +2,17 @@ import { PlayerListStore } from "../context/PlayerListStore";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import { SocketStore } from "../context/SocketStore";
 
-//const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
+
+const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
 // const socket = io.connect("http://localhost:3001", {
 //   reconnection: true,
 //   reconnectionAttempts: Infinity,
 // });
-////////////
+//////////
 
 function RoomPage(props) {
-  const [Socket, setSocket] = SocketStore();
+
   const testList = useRef([]);
   const router = useRouter();
   const [playerList, setPlayerList] = PlayerListStore();
@@ -25,7 +25,7 @@ function RoomPage(props) {
     }
     if (String(router.query.host) == "false") {
       //client asks host to server for list of players
-      Socket.emit("initialRoomReq", {
+      socket.emit("initialRoomReq", {
         name: router.query.name,
         roomID: router.query.roomID,
       });
@@ -44,7 +44,7 @@ function RoomPage(props) {
   //host gets request for list of players and sends to server
   useEffect(() => {
     if (router.query.host == "true") {
-      Socket.on("initalRoomReqHost", (data) => {
+      socket.on("initalRoomReqHost", (data) => {
         setPlayerListFunc(data.name); //add name to list
       });
     }
@@ -53,12 +53,12 @@ function RoomPage(props) {
   //server sends list of players back to client
   useEffect(() => {
     if (router.query.host == "false") {
-      Socket.on("initialRoomRes", (data) => {
+      socket.on("initialRoomRes", (data) => {
         console.log("respones from host recieved: " + data.lobbyList);
         setPlayerListFuncAll(data.lobbyList); //set playerList to the updated list
       });
     }
-  }, [Socket]);
+  }, [socket]);
 
   //when the host player list changed, update other clients with new list
   useEffect(() => {
@@ -83,14 +83,14 @@ function RoomPage(props) {
     }
   }
 
-  Socket.emit("startRoom", {
+  socket.emit("startRoom", {
     roomID: String(router.query.roomID),
   });
 
   //host sends player list to clients
   function updatePlayerList() {
     testList.current = playerList.slice(0); //save the shallow playerList to testList reference, (needs to be sliced for shallow copy otherwise it will be a reference to the playerList)
-    Socket.emit("initialRoomResHost", {
+    socket.emit("initialRoomResHost", {
       lobbyList: playerList,
       roomID: router.query.roomID,
     });
@@ -98,21 +98,21 @@ function RoomPage(props) {
 
   ////////////////
   useEffect(() => {
-    Socket.on("roomStart", (data) => {
+    socket.on("roomStart", (data) => {
       roomCode = data.roomID;
     });
-  }, [Socket, roomCode]);
+  }, [socket, roomCode]);
 
   function startGame() {
     if (router.query.host == "true") {
-      Socket.emit("gameStart", {
+      socket.emit("gameStart", {
         roomID: roomCode,
       });
       router.push({ pathname: "/gamePage", query: { roomID: roomCode } });
     }
   }
   useEffect(() => {
-    Socket.on("startGameClient", (data) => {
+    socket.on("startGameClient", (data) => {
       router.push({ pathname: "/gamePage", query: { roomID: roomCode } });
     });
   });
@@ -127,17 +127,17 @@ function RoomPage(props) {
     }
 
     useEffect (() => {
-      Socket.on("chat-message", (data) => {
+      socket.on("chat-message", (data) => {
         console.log("hello, chat-message recieved")
         appendMessage(data)
       })
-    }, [Socket])
+    }, [socket])
 
     useEffect (() => {
-      Socket.on("userConnected", (data) => {
+      socket.on("userConnected", (data) => {
         appendMessage(data.name + " joined.")
       })
-    }, [Socket])
+    }, [socket])
 
     useEffect(() => {
       console.log("chat initalized")
@@ -148,7 +148,7 @@ function RoomPage(props) {
       messageForm.addEventListener("submit", e => {
         e.preventDefault()
         const message = messageInput.value
-        Socket.emit("sendChatMessage", {
+        socket.emit("sendChatMessage", {
           message: message,
           roomID: roomCode,
           name: router.query.name,
