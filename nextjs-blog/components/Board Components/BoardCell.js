@@ -8,7 +8,7 @@ import { SocketStore } from "../../context/SocketStore.js";
 import { useEffect } from "react";
 import io from "socket.io-client";
 
-//const socket = io.connect("https://mighty-brushlands-84806.herokuapp.com/");
+const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 // const socket = io.connect("http://localhost:3001", {
 //   reconnection: true,
 //   reconnectionDelay: 1000,
