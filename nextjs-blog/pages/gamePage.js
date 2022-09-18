@@ -12,7 +12,6 @@ import io from "socket.io-client";
 ////////////////
 
 function GamePage() {
-  return <div>Hello World</div>;
-  //return <Game />;
+  return <Game />;
 }
 export default GamePage;
