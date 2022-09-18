@@ -2,7 +2,6 @@ import Link from "next/link";
 //import Game from "../components/Game";
 import { useRouter } from "next/router";
 
-
 <link rel="stylesheet" href="globals.css"></link>;
 import io from "socket.io-client";
 
@@ -12,9 +11,8 @@ import io from "socket.io-client";
 
 ////////////////
 
-
 function GamePage() {
-  <div>Hello World</div>
+  return <div>Hello World</div>;
   //return <Game />;
 }
 export default GamePage;

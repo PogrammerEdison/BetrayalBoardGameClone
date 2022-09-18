@@ -49,7 +49,7 @@ function RoomPage(props) {
         setPlayerListFunc(data.name); //add name to list
       });
     }
-  }, [Socket]);
+  }, [socket]);
 
   //server sends list of players back to client
   useEffect(() => {
