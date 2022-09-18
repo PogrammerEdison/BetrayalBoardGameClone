@@ -1,5 +1,5 @@
 
-//import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { PlayerListStore } from "../context/PlayerListStore.js";
 import { SocketStore } from "../context/SocketStore.js";
 import io from "socket.io-client";
@@ -20,7 +20,7 @@ function HomePage(props) {
 
   const [Socket, setSocket] = SocketStore();
   const [playerList, setPlayerList] = PlayerListStore();
-  //const router = useRouter();
+  const router = useRouter();
 
   function startRoom() {
     Socket.emit("startRoom", {
@@ -30,14 +30,14 @@ function HomePage(props) {
   }
 
   function connectRoom() {
-    // router.push({
-    //   pathname: "/lobby",
-    //   query: {
-    //     roomID: document.getElementById("roomID").value,
-    //     host: false,
-    //     name: document.getElementById("name").value,
-    //   },
-    // });
+    router.push({
+      pathname: "/lobby",
+      query: {
+        roomID: document.getElementById("roomID").value,
+        host: false,
+        name: document.getElementById("name").value,
+      },
+    });
   }
 
   return (
@@ -52,18 +52,18 @@ function HomePage(props) {
       </div>
       <div style={{ position: "absolute", left: "45%", top: "50%" }}>
         <button
-          // onClick={() => {
-          //   setPlayerList([document.getElementById("name").value]),
-          //     router.push({
-          //       pathname: "/lobby",
-          //       query: {
-          //         host: true,
-          //         roomID: String(Math.floor(Math.random() * 1000)),
-          //         startRoom,
-          //         name: document.getElementById("name").value,
-          //       },
-          //     });
-          // }}
+          onClick={() => {
+            setPlayerList([document.getElementById("name").value]),
+              router.push({
+                pathname: "/lobby",
+                query: {
+                  host: true,
+                  roomID: String(Math.floor(Math.random() * 1000)),
+                  startRoom,
+                  name: document.getElementById("name").value,
+                },
+              });
+          }}
         >
           Create a Room
         </button>
