@@ -20,13 +20,13 @@ import io from "socket.io-client";
 ////////////
 
 function BoardCell(props) {
-  const [Socket, setSocket] = SocketStore();
+
   const [playerOne, playerTwo] = PlayerDetailsStore();
   const [cardStack, setCardStack] = CardStackStore();
   const [eventCard, showEventCard] = useEventCardStore();
 
   useEffect(() => {
-    Socket.on("receive_message", (data) => {
+    socket.on("receive_message", (data) => {
       setCardStack(cardStack.slice(1));
       document.getElementById(parseInt(data.cellId)).src = data.image;
       console.log(cardStack);
@@ -34,12 +34,12 @@ function BoardCell(props) {
       console.log(data.cellId);
       console.log(document.getElementById(data.cellId));
     });
-  }, [Socket, cardStack]);
+  }, [socket, cardStack]);
 
   ////////////////
   function boardChange() {
     console.log("emmiting");
-    Socket.emit("send_message", {
+    socket.emit("send_message", {
       message: "HelloYOYOYOYO",
       cellId: String(props.id),
       image: cardStack[0].image,
