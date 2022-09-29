@@ -5,18 +5,18 @@ import { useRef } from "react";
 import io from "socket.io-client";
 
 
-// const socket = io.connect("http://localhost:3001", {
-//   reconnection: true,
-//   reconnectionAttempts: Infinity,
-//   forceNewConnection: false,
-// });
+const socket = io.connect("http://localhost:3001", {
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  forceNewConnection: false,
+});
 
 const Store = createContext();
 
 export const SocketStore = () => useContext(Store);
 
 export const SocketStoreProvider = ({ children }) => {
-  const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
+  //const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
   const [Socket, setSocket] = useRef(0);
 
   return (

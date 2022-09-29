@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { useState } from "react";
 
 const Store = createContext();
 
@@ -57,12 +58,13 @@ export const PlayerDetailsStore = () => useContext(Store);
 export const PlayerDetailsStoreProvider = ({ children }) => {
   let playerOne = new Player(5, 5, 5, 60, []);
   let playerTwo = new Player(5, 5, 5, 59, []);
+  const [playerOneImage, setPlayerOneImage] = useState("https://i.imgur.com/pdPR9ds.png")
   // const [playerOne, setPlayerOne] = useState(playerOne);
   // const [playerTwo, setPlayerTwo] = useState(playerTwo);
 
   return (
     <>
-      <Store.Provider value={[playerOne, playerTwo]}>{children}</Store.Provider>
+      <Store.Provider value={[playerOne, playerOneImage, setPlayerOneImage]}>{children}</Store.Provider>
       ,
     </>
   );

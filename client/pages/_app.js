@@ -8,31 +8,34 @@ import { ItemStoreProvider } from "../context/ItemStore.js";
 import { ActiveCellStoreProvider } from "../context/ActiveCellStore.js";
 import { TestStoreProvider } from "../context/TestStore.js";
 import { PlayerListStoreProvider } from "../context/PlayerListStore.js";
+import { CameraReducerProvider } from "../context/CameraReducer.js";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <SocketStoreProvider>
-      <PlayerListStoreProvider>
-        <TestStoreProvider>
-          <ActiveCellStoreProvider>
-            <ItemStoreProvider>
-              <CardTriggerProvider>
-                <CardStackStoreProvider>
-                  <PlayerDetailsStoreProvider>
-                    <EventStoreProvider>
-                      <EventCardStoreProvider>
-                        <Component {...pageProps} />
-                      </EventCardStoreProvider>
-                    </EventStoreProvider>
-                  </PlayerDetailsStoreProvider>
-                </CardStackStoreProvider>
-              </CardTriggerProvider>
-            </ItemStoreProvider>
-          </ActiveCellStoreProvider>
-        </TestStoreProvider>
-      </PlayerListStoreProvider>
-    </SocketStoreProvider>
+    <CameraReducerProvider>
+      <SocketStoreProvider>
+        <PlayerListStoreProvider>
+          <TestStoreProvider>
+            <ActiveCellStoreProvider>
+              <ItemStoreProvider>
+                <CardTriggerProvider>
+                  <CardStackStoreProvider>
+                    <PlayerDetailsStoreProvider>
+                      <EventStoreProvider>
+                        <EventCardStoreProvider>
+                          <Component {...pageProps} />
+                        </EventCardStoreProvider>
+                      </EventStoreProvider>
+                    </PlayerDetailsStoreProvider>
+                  </CardStackStoreProvider>
+                </CardTriggerProvider>
+              </ItemStoreProvider>
+            </ActiveCellStoreProvider>
+          </TestStoreProvider>
+        </PlayerListStoreProvider>
+      </SocketStoreProvider>
+    </CameraReducerProvider>
   );
 }
 export default MyApp;

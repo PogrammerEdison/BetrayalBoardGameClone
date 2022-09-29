@@ -4,30 +4,38 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import io from "socket.io-client";
 import classes from "./chatBox.module.css";
+import Webcam from "react-webcam";
+import { useState } from "react";
+import { PlayerDetailsStore } from "../context/PlayerStore";
 
-const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
-// const socket = io.connect("http://localhost:3001", {
-//   reconnection: true,
-//   reconnectionAttempts: Infinity,
-// });
-//////////
+//const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
+const socket = io.connect("http://localhost:3001", {
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+});
+////////
 
 function RoomPage(props) {
+  const [playerOne, playerOneImage, setPlayerOneImage] = PlayerDetailsStore();
+  const [testImage, setTestImage] = useState(""); //useState("https://i.imgur.com/pdPR9ds.png");
+
   const testList = useRef([]);
   const router = useRouter();
   const [playerList, setPlayerList] = PlayerListStore();
+  const [playerImage, setPlayerImage] = useState(null);
   let roomCode = router.query.roomID;
-
+  playerList;
   //on client load, get list of players
   function initialEmit() {
     if (String(router.query.host) == "true") {
-      testList.current = [String(router.query.name)]; //create reference with host name in array
+      testList.current = [[String(router.query.name), playerOneImage]]; //create reference with host name in array
     }
     if (String(router.query.host) == "false") {
       //client asks host to server for list of players
       socket.emit("initialRoomReq", {
         name: router.query.name,
         roomID: router.query.roomID,
+        image: playerOneImage,
       });
     }
   }
@@ -45,7 +53,7 @@ function RoomPage(props) {
   useEffect(() => {
     if (router.query.host == "true") {
       socket.on("initalRoomReqHost", (data) => {
-        setPlayerListFunc(data.name); //add name to list
+        setPlayerListFunc(data.name, data.image); //add name to list
       });
     }
   }, [socket]);
@@ -68,9 +76,9 @@ function RoomPage(props) {
   }, [playerList]);
 
   //set new player List
-  function setPlayerListFunc(newPlayer) {
+  function setPlayerListFunc(newPlayerName, newPlayerImage) {
     const tempArray = testList.current;
-    tempArray.push(newPlayer);
+    tempArray.push([newPlayerName, newPlayerImage]);
     setPlayerList(tempArray); //this triggers the useEffect above
   }
 
@@ -119,23 +127,41 @@ function RoomPage(props) {
 
   let messageContainer = null;
 
-  function appendMessage(message) {
+  function appendMessage(message, image) {
+    const parentElement = document.createElement("div");
     const messageElement = document.createElement("div");
+    const messageImage = document.createElement("img");
+    parentElement.style.margin = "5px";
+    messageImage.src = image;
+    messageImage.style.width = "50px";
+    messageImage.style.height = "50px";
+    messageImage.style.borderRadius = "50%";
+    messageImage.style.border = "solid";
+    messageImage.style.verticalAlign = "middle";
     messageElement.innerText = message;
+    messageElement.style.display = "inline-flex";
+    messageElement.style.marginLeft = "10px";
+    messageElement.style.verticalAlign = "middle";
+    parentElement.appendChild(messageImage);
+    parentElement.appendChild(messageElement);
+    //messageElement.appendChild(messageImage);
     console.log(messageContainer);
-    messageContainer.append(messageElement);
+    messageContainer.append(parentElement);
   }
 
   useEffect(() => {
     socket.on("chat-message", (data) => {
       console.log("hello, chat-message recieved");
-      appendMessage(data);
+      console.log(data);
+      let connectMessage = data.name + ": " + data.message;
+      appendMessage(connectMessage, data.image);
     });
   }, [socket]);
 
   useEffect(() => {
     socket.on("userConnected", (data) => {
-      appendMessage(data.name + " joined.");
+      console.log(data);
+      appendMessage(data.name + " joined.", data.image);
     });
   }, [socket]);
 
@@ -152,11 +178,17 @@ function RoomPage(props) {
         message: message,
         roomID: roomCode,
         name: router.query.name,
+        image: playerOneImage,
       });
-      appendMessage("You: " + message);
+      appendMessage("You: " + message, playerOneImage);
       messageInput.value = "";
     });
   }, []);
+
+  const videoConstraints = {
+    width: 200,
+    height: 200,
+  };
 
   return (
     <div>
@@ -169,9 +201,54 @@ function RoomPage(props) {
       <div style={{ position: "absolute", left: "19%", top: "20%" }}>
         Players in Lobby:
         <ul>
-          {playerList.map((player) => {
-            return <li key={player + "test"}>{player}</li>;
-          })}
+          <div style={{ width: "300px", height: "300px", border: "solid", borderRadius: "10%" }}>
+            {playerList.map((player) => {
+              return (
+                <div
+                  key={player}
+                  style={{ width: "300px", height: "60px", padding: "8px" }}
+                >
+                  <li
+                    style={{
+                      position: "relative",
+                      left: "0%",
+                      top: "0%",
+                      padding: "0px",
+                      listStyle: "none",
+                    }}
+                    key={player + "test"}
+                  >
+                    <img
+                      key={player}
+                      src={player[1]}
+                      style={{
+                        borderRadius: "300px",
+                        border: "solid",
+                        position: "relative",
+                        width: "50px",
+                        height: "50px",
+                        left: "2%",
+                        top: "0%",
+                        verticalAlign: "middle",
+                      }}
+                    ></img>
+                    <div
+                      style={{
+                        position: "relative",
+                        left: "10%",
+                        top: "20%",
+                        display: "inline-flex",
+                        verticalAlign: "middle",
+                        padding: "0px",
+                      }}
+                    >
+                      {player[0]}
+                    </div>
+                  </li>
+                </div>
+              );
+            })}
+          </div>
         </ul>
       </div>
       <div
@@ -195,10 +272,19 @@ function RoomPage(props) {
       </div>
       <form
         id="send-container"
-        style={{ position: "absolute", left: "71%", top: "83%", width: "300px" }}
+        style={{
+          position: "absolute",
+          left: "71%",
+          top: "83%",
+          width: "300px",
+        }}
       >
-        <input type="text" id="message-input" style={{width: "80%"}}></input>
-        <button type="submit" id="send-button" style={{position: "relative", left:"0%", top: "0%"}}>
+        <input type="text" id="message-input" style={{ width: "80%" }}></input>
+        <button
+          type="submit"
+          id="send-button"
+          style={{ position: "relative", left: "0%", top: "0%" }}
+        >
           Send
         </button>
       </form>

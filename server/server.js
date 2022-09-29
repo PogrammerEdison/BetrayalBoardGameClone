@@ -8,13 +8,13 @@ app.use(cors());
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: { origin: "https://test-clone2.vercel.app", methods: ["GET", "POST"] },
-});
-
 // const io = new Server(server, {
-//   cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+//   cors: { origin: "https://test-clone2.vercel.app", methods: ["GET", "POST"] },
 // });
+
+const io = new Server(server, {
+  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+});
 
 io.on("connection", (socket) => {console.log('User connected: ' + socket.id);
 
@@ -45,8 +45,7 @@ socket.on("initialRoomReq", (data) => {
   console.log(data.message);
   console.log("hello here")
   console.log(data.name);
-  let connectMessage = (data.name + ": " + data.message);
-  socket.to(data.roomID).emit("chat-message", connectMessage);
+  socket.to(data.roomID).emit("chat-message", data);
  });
 
 
