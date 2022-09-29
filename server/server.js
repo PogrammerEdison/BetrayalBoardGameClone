@@ -9,7 +9,7 @@ app.use(cors());
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "https://test-clone2.vercel.app", methods: ["GET", "POST"] },
+  cors: { origin: "https://betrayalclone.vercel.app", methods: ["GET", "POST"] },
 });
 
 // const io = new Server(server, {

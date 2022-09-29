@@ -15,7 +15,7 @@ const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 // });
 ////////
 
-function RoomPage(props) {
+function RoomPage() {
   const [playerOne, playerOneImage, setPlayerOneImage] = PlayerDetailsStore();
   const [testImage, setTestImage] = useState(""); //useState("https://i.imgur.com/pdPR9ds.png");
 
