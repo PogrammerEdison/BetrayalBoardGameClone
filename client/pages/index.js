@@ -11,12 +11,12 @@ import { PlayerDetailsStore } from "../context/PlayerStore";
 
 <link rel="stylesheet" href="globals.css"></link>;
 
-// const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
+const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 
-const socket = io.connect("http://localhost:3001", {
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-});
+// const socket = io.connect("http://localhost:3001", {
+//   reconnection: true,
+//   reconnectionAttempts: Infinity,
+// });
 
 ////////////
 
