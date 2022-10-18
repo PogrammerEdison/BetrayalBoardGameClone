@@ -65,10 +65,6 @@ function Board(props) {
   }
 
   setClient();
-  console.log(playerList)
-  console.log(playerOne);
-  console.log(clientName);
-  console.log("client player is " + clientPlayer);
   const [
     currentTurn,
     setCurrentTurn,
