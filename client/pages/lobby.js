@@ -7,8 +7,10 @@ import classes from "./chatBox.module.css";
 import Webcam from "react-webcam";
 import { useState } from "react";
 import { PlayerDetailsStore } from "../context/PlayerStore";
+import { SocketStore } from "../context/SocketStore";
+import { TurnTrackerStore } from "../context/TurnTrackerStore";
 
-const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
+// const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 // const socket = io.connect("http://localhost:3001", {
 //   reconnection: true,
 //   reconnectionAttempts: Infinity,
@@ -16,23 +18,43 @@ const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 ////////
 
 function RoomPage() {
-  const [playerOne, playerOneImage, setPlayerOneImage] = PlayerDetailsStore();
-  const [testImage, setTestImage] = useState(""); //useState("https://i.imgur.com/pdPR9ds.png");
-
+  const [Socket, setSocket] = SocketStore();
+  const [
+    playerOneImage,
+    setPlayerOneImage,
+    playerOne,
+    setPlayerOne,
+    playerTwo,
+    setPlayerTwo,
+    playerThree,
+    setPlayerThree,
+    playerFour,
+    setPlayerFour,
+    clientName,
+    setClientName,
+    clientPlayer,
+    setClientPlayer,
+  ] = PlayerDetailsStore();
+  const playerStats = [playerOne, playerTwo, playerThree, playerFour];
+  const players = [setPlayerOne, setPlayerTwo, setPlayerThree, setPlayerFour];
+  let playerCount = 0;
+  const [currentTurn, setCurrentTurn, isTurn, setIsTurn] = TurnTrackerStore();
   const testList = useRef([]);
   const router = useRouter();
   const [playerList, setPlayerList] = PlayerListStore();
   const [playerImage, setPlayerImage] = useState(null);
   let roomCode = router.query.roomID;
-  playerList;
+
   //on client load, get list of players
   function initialEmit() {
     if (String(router.query.host) == "true") {
+      setPlayerOne([5, 5, 5, 60, [], clientName]);
       testList.current = [[String(router.query.name), playerOneImage]]; //create reference with host name in array
     }
     if (String(router.query.host) == "false") {
+      setCurrentTurn(playerOne[5]);
       //client asks host to server for list of players
-      socket.emit("initialRoomReq", {
+      Socket.emit("initialRoomReq", {
         name: router.query.name,
         roomID: router.query.roomID,
         image: playerOneImage,
@@ -49,24 +71,39 @@ function RoomPage() {
     };
   }, []);
 
+  useEffect(() => {
+    setCurrentTurn(playerOne[5]);
+  }, [playerOne]);
+
   //host gets request for list of players and sends to server
   useEffect(() => {
     if (router.query.host == "true") {
-      socket.on("initalRoomReqHost", (data) => {
+      Socket.on("initalRoomReqHost", (data) => {
+        ++playerCount;
+        players[playerCount]([5, 5, 5, 60, [], data.name]);
         setPlayerListFunc(data.name, data.image); //add name to list
       });
     }
-  }, [socket]);
+  }, [Socket]);
 
   //server sends list of players back to client
   useEffect(() => {
     if (router.query.host == "false") {
-      socket.on("initialRoomRes", (data) => {
+      Socket.on("initialRoomRes", (data) => {
         console.log("respones from host recieved: " + data.lobbyList);
         setPlayerListFuncAll(data.lobbyList); //set playerList to the updated list
+        for (var i = 0; i < 4; i++) {
+          console.log("done")
+          players[i]([5, 5, 5, 60, [], data.players[i][5]]);
+        }
+        console.log(playerStats)
       });
     }
-  }, [socket]);
+  }, [Socket]);
+
+  useEffect(() => {
+    console.log(playerStats)
+  }, [playerStats]);
 
   //when the host player list changed, update other clients with new list
   useEffect(() => {
@@ -87,40 +124,56 @@ function RoomPage() {
     if (router.query.host == "false") {
       let tempArray = playerList.slice(0);
       tempArray = list.slice(0);
+      setCurrentTurn(tempArray[0][0]);
       setPlayerList(tempArray);
     }
   }
 
-  socket.emit("startRoom", {
+  Socket.emit("startRoom", {
     roomID: String(router.query.roomID),
   });
 
   //host sends player list to clients
   function updatePlayerList() {
     testList.current = playerList.slice(0); //save the shallow playerList to testList reference, (needs to be sliced for shallow copy otherwise it will be a reference to the playerList)
-    socket.emit("initialRoomResHost", {
+    Socket.emit("initialRoomResHost", {
       lobbyList: playerList,
       roomID: router.query.roomID,
+      players: playerStats,
     });
   }
 
   ////////////////
   useEffect(() => {
-    socket.on("roomStart", (data) => {
+    Socket.on("roomStart", (data) => {
       roomCode = data.roomID;
     });
-  }, [socket, roomCode]);
+  }, [Socket, roomCode]);
+
+  function setClient() {
+    console.log("set client called");
+    for (var i = 0; i < 4; i++) {
+      console.log(players[i]);
+      console.log(clientName);
+      if (players[i][5] == clientName) {
+        console.log("matching found " + players[i][5]);
+        setClientPlayer(players[i]);
+      }
+    }
+  }
 
   function startGame() {
     if (router.query.host == "true") {
-      socket.emit("gameStart", {
+      setClient();
+      Socket.emit("gameStart", {
         roomID: roomCode,
       });
       router.push({ pathname: "/gamePage", query: { roomID: roomCode } });
     }
   }
   useEffect(() => {
-    socket.on("startGameClient", (data) => {
+    setClient();
+    Socket.on("startGameClient", (data) => {
       router.push({ pathname: "/gamePage", query: { roomID: roomCode } });
     });
   });
@@ -150,20 +203,20 @@ function RoomPage() {
   }
 
   useEffect(() => {
-    socket.on("chat-message", (data) => {
+    Socket.on("chat-message", (data) => {
       console.log("hello, chat-message recieved");
       console.log(data);
       let connectMessage = data.name + ": " + data.message;
       appendMessage(connectMessage, data.image);
     });
-  }, [socket]);
+  }, [Socket]);
 
   useEffect(() => {
-    socket.on("userConnected", (data) => {
+    Socket.on("userConnected", (data) => {
       console.log(data);
       appendMessage(data.name + " joined.", data.image);
     });
-  }, [socket]);
+  }, [Socket]);
 
   useEffect(() => {
     console.log("chat initalized");
@@ -174,7 +227,7 @@ function RoomPage() {
     messageForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const message = messageInput.value;
-      socket.emit("sendChatMessage", {
+      Socket.emit("sendChatMessage", {
         message: message,
         roomID: roomCode,
         name: router.query.name,
@@ -191,22 +244,43 @@ function RoomPage() {
   };
 
   return (
-    <div>
-      <div style={{ position: "absolute", left: "49%", top: "5%" }}>
-        Lobby, socket id: {socket.id}
-      </div>
-      <div style={{ position: "absolute", left: "49%", top: "10%" }}>
+    <div
+      style={{
+        background: "URL(/lobbyBackground.png)",
+        backgroundSize: "100%",
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "39%",
+          top: "10%",
+          fontFamily: "Helvetica, sans-serif",
+          fontSize: "46px",
+        }}
+      >
         Lobby code: {roomCode}
       </div>
-      <div style={{ position: "absolute", left: "19%", top: "20%" }}>
-        Players in Lobby:
+      <div style={{ position: "absolute", left: "9%", top: "20%" }}>
+        <div style={{ padding: "10px" }}>Players in Lobby:</div>
         <ul>
-          <div style={{ width: "300px", height: "300px", border: "solid", borderRadius: "10%" }}>
+          <div
+            style={{
+              width: "300px",
+              height: "300px",
+              border: "solid",
+              borderRadius: "10%",
+              backgroundImage: "linear-gradient(red, yellow)",
+            }}
+          >
             {playerList.map((player) => {
               return (
                 <div
                   key={player}
-                  style={{ width: "300px", height: "60px", padding: "8px" }}
+                  style={{ width: "300px", height: "60px", padding: "5px" }}
                 >
                   <li
                     style={{
@@ -279,18 +353,40 @@ function RoomPage() {
           width: "300px",
         }}
       >
-        <input type="text" id="message-input" style={{ width: "80%" }}></input>
-        <button
-          type="submit"
-          id="send-button"
-          style={{ position: "relative", left: "0%", top: "0%" }}
-        >
-          Send
-        </button>
+        <input
+          type="text"
+          id="message-input"
+          style={{ width: "80%", padding: "5px", borderRadius: "10px" }}
+        ></input>
+        <div style={{ padding: "5px", display: "inline-block" }}>
+          <button
+            type="submit"
+            id="send-button"
+            style={{
+              position: "relative",
+              left: "0%",
+              top: "0%",
+              backgroundImage: "linear-gradient(blue, turquoise)",
+              borderRadius: "10px",
+              display: "inline-block",
+              padding: "5px",
+            }}
+          >
+            Send
+          </button>
+        </div>
       </form>
       <button
         onClick={startGame}
-        style={{ position: "absolute", left: "49%", top: "50%" }}
+        style={{
+          position: "absolute",
+          left: "47%",
+          top: "50%",
+          backgroundImage: "linear-gradient(blue, turquoise)",
+          width: "100px",
+          height: "50px",
+          borderRadius: "25px",
+        }}
       >
         Start
       </button>

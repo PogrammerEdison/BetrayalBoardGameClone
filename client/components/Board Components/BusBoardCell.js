@@ -90,17 +90,22 @@ function BusBoardCell(props) {
     <td
       style={{
         //border: "1px solid #555",
+        // width: "50px",
+        // height: "50px",
+        // lineHeight: "50px",
+        // textAlign: "center",
         width: "50px",
         height: "50px",
-        lineHeight: "50px",
-        textAlign: "center",
+        padding: "0px",
+        margin: "0px",
+        objectFit: "cover",
       }}
     >
       <div className="square">
         <img
           src="https://i.imgur.com/wrrKYfO.png"
           id={props.id}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
       </div>
     </td>

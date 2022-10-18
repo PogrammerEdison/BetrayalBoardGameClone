@@ -3,14 +3,41 @@ import { PlayerDetailsStore } from "../../context/PlayerStore";
 import { useEventCardStore } from "../../context/EventCardStore.js";
 import PlayerCard from "../Player Components/PlayerCard";
 import * as cardActionsCards from "../../playerActions/cardActionsCards.js";
+import { PlayerListStore } from "../../context/PlayerListStore";
+import { useEffect } from "react";
 
 export default function EventCard(props) {
-  const [playerOne] = PlayerDetailsStore();
+  const [
+    playerOneImage,
+    setPlayerOneImage,
+    playerOne,
+    setPlayerOne,
+    playerTwo,
+    setPlayerTwo,
+    playerThree,
+    setPlayerThree,
+    playerFour,
+    setPlayerFour,
+    clientName,
+    setClientName,
+    clientPlayer,
+    setClientPlayer,
+  ] = PlayerDetailsStore();
+  let count = 0;
   const [eventCard, showEventCard] = useEventCardStore();
+  const [playerList, setPlayerList] = PlayerListStore();
 
-  function test(type) {
-    console.log("The type is " + type);
-    return type;
+  const players = [playerOne, playerTwo, playerThree, playerFour];
+  let penaltyTrig = false;
+  let penalty = 0;
+  useEffect(() => {
+    console.log(props.player)
+    props.player[props.type] += penalty;
+    count = count + 1;
+  }, [penalty]);
+
+  function normalHandler() {
+    penalty = cardActionsCards.normalRoll(props, props.player, showEventCard);
   }
 
   function test2(type) {
@@ -37,12 +64,7 @@ export default function EventCard(props) {
         return (
           <div>
             {console.log("we in the roll")}
-            <button
-              className={classes.actionButton}
-              onClick={function () {
-                cardActionsCards.normalRoll(props, playerOne, showEventCard);
-              }}
-            >
+            <button className={classes.actionButton} onClick={normalHandler}>
               Roll {props.type}
             </button>
           </div>
@@ -84,17 +106,30 @@ export default function EventCard(props) {
 
   return (
     <div className={classes.fp_container}>
-      <div
-        style={{
-          position: "absolute",
-          left: "80%",
-          bottom: "70%",
-          width: "200px",
-          height: "200px",
-        }}
-      >
-        <PlayerCard />
-      </div>
+      {playerList.map((player, i = -1) => {
+        i++;
+        if (player[0] == clientName) {
+          //need a way to get the current player
+          {
+            console.log("attention");
+          }
+          console.log(players[i]);
+          return (
+            <div
+              key={player}
+              style={{ position: "relative", width: "160px", height: "270px" }}
+            >
+              <PlayerCard
+                key={i}
+                name={player[0]}
+                image={player[1]}
+                player={players[i]}
+                counter={count}
+              />{" "}
+            </div>
+          );
+        }
+      })}
       <div
         id="dice-0"
         className="dice"

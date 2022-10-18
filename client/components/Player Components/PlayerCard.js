@@ -1,35 +1,62 @@
 import { PlayerDetailsStore } from "../../context/PlayerStore.js";
 import Image from "next/image";
+import { useRef } from "react";
 
 function PlayerCard(props) {
-  const [playerOne] = PlayerDetailsStore();
-  console.log(playerOne.Items);
+  console.log(props.player);
   return (
-    <div>
+    <div
+      style={{
+        position: "relative",
+        width: "160px",
+        height: "270px",
+        margin: "10px",
+      }}
+    >
       <div>
-        <Image src="/RedCard.png" alt="me" width="512px" height="512px"></Image>
+        <Image src="/RedCard.png" alt="me" layout="fill"></Image>
+      </div>
+      <div>
+        <img
+          src={props.image}
+          alt="me"
+          style={{
+            position: "relative",
+            width: "100px",
+            height: "100px",
+            left: "31px",
+            top: "44px",
+            borderRadius: "100%",
+            border: "solid",
+            margin: "0px",
+          }}
+        ></img>
       </div>
       <div
         style={{
-          position: "absolute",
-          left: "90%",
-          bottom: "80%",
+          position: "relative",
           fontFamily: "Arial Black",
           color: "rgb(154,0,0)",
         }}
       >
         <div
           style={{
-            position: "fixed",
-            left: "94%",
-            bottom: "90%",
+            position: "relative",
+            left: "0%",
+            top: "150px",
             fontFamily: "Arial Black",
             color: "rgb(154,0,0)",
           }}
         >
           <strong>Items:</strong>
           <ul>
-            {playerOne.items.map((item) => {
+            {console.log("heeee " + props.player)}
+            {console.log(props.player)}
+            {console.log(props.player[4])}
+            {props.player[4].map((item) => {
+              {
+                console.log("hi");
+              }
               return (
                 <li>
                   <img
@@ -45,56 +72,57 @@ function PlayerCard(props) {
           </ul>
         </div>
       </div>
+      {console.log(props.name)}
       <div
         style={{
-          position: "absolute",
-          left: "31%",
-          bottom: "37%",
+          position: "relative",
+          left: "25%",
+          top: "7%",
           fontFamily: "Arial Black",
           color: "rgb(154,0,0)",
         }}
       >
         <em>
-          <b>playerOne</b>
+          <b>{props.name}</b>
         </em>
       </div>
       <div
         style={{
-          position: "absolute",
+          position: "relative",
           left: "55%",
-          bottom: "27%",
+          top: "22px",
           fontFamily: "Arial Black",
           color: "rgb(154,0,0)",
         }}
       >
         <em>
-          <b>{playerOne.Strength}</b>
+          <b>{props.player[0]}</b>
         </em>
       </div>
       <div
         style={{
-          position: "absolute",
+          position: "relative",
           left: "55%",
-          bottom: "19%",
+          top: "20px",
           fontFamily: "Arial Black",
           color: "rgb(154,0,0)",
         }}
       >
         <em>
-          <b>{playerOne.Intelligence}</b>
+          <b>{props.player[1]}</b>
         </em>
       </div>
       <div
         style={{
-          position: "absolute",
+          position: "relative",
           left: "55%",
-          bottom: "12%",
+          top: "18px",
           fontFamily: "Arial Black",
           color: "rgb(154,0,0)",
         }}
       >
         <em>
-          <b>{playerOne.speed}</b>
+          <b>{props.player[2]}</b>
         </em>
       </div>
     </div>

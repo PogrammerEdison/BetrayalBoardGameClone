@@ -1,35 +1,34 @@
-const throwdice = () => Math.floor(Math.random() * 3);
+import { useEffect } from "react";
 
+const throwdice = () => Math.floor(Math.random() * 3);
 
 let rollType = "none";
 
-
-
-export function CourtHouse(props, playerOne, showEventCard){
+export function CourtHouse(props, playerOne, showEventCard) {
   rollType = highestTrait(playerOne);
   document.getElementById("courtButton").innerHTML = "Rolling " + rollType;
   diceRoll(props, playerOne, showEventCard);
-
 }
 
-export function normalDiscard(props, playerOne, showEventCard){
+export function normalDiscard(props, playerOne, showEventCard) {
   console.log(playerOne.items);
-  if(props.penalty == "weapon"){
+  if (props.penalty == "weapon") {
     removeWeapons(playerOne);
   }
   showEventCard("none");
 }
 
-export function normalAdd(props, playerOne, showEventCard){
+export function normalAdd(props, playerOne, showEventCard) {
   playerOne[props.type] = playerOne[props.type] + props.value;
   showEventCard("none");
 }
 
-export function normalRoll(props, playerOne, showEventCard){
-  rollType = props.type
-  diceRoll(props, playerOne, showEventCard);
+export function normalRoll(props, playerOne, showEventCard) {
+  rollType = props.type;
+  console.log(playerOne);
+  return diceRoll(props, playerOne, showEventCard);
+  
 }
-
 
 function resetDice() {
   for (let i = 0; i < 5; i++) {
@@ -38,7 +37,7 @@ function resetDice() {
   }
 }
 
-function removeWeapons(playerOne){
+function removeWeapons(playerOne) {
   const tempArray = [];
   playerOne.items.map((item) => {
     if (item.type !== "Weapon") {
@@ -70,9 +69,7 @@ function highestTrait(playerOne) {
 }
 
 function diceRoll(props, playerOne, showEventCard) {
-  let test = props.type;
   let totalRoll = 0;
-  console.log(playerOne[rollType]);
   resetDice();
   for (let i = 0; i < playerOne[rollType]; i++) {
     let diceRollsString = "dice-" + i;
@@ -84,11 +81,11 @@ function diceRoll(props, playerOne, showEventCard) {
     totalRoll += roll;
   }
   setTimeout(() => showEventCard({ type: false }), 8000);
-  if (totalRoll < 9) {
-    console.log(props.penalty);
+  if (totalRoll < 10) {
     setTimeout(
-      () => (playerOne[rollType] = playerOne[rollType] + props.penalty),
+      () => (playerOne[rollType] = playerOne[rollType] + props.penalty, console.log(playerOne)),
       6000
     );
   }
+  return props.penalty
 }

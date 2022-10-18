@@ -39,7 +39,11 @@ export default function BusStationEvent(props) {
       <table
         id="board"
         style={{
+          borderCollapse:"collapse",
+          borderSpacing: "0px",
+          margin: "0px",
           border: "solid",
+          outline: "0px",
           position: "absolute",
           left: "52%",
           bottom: "10%",

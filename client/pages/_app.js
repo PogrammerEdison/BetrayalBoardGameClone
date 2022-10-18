@@ -9,10 +9,13 @@ import { ActiveCellStoreProvider } from "../context/ActiveCellStore.js";
 import { TestStoreProvider } from "../context/TestStore.js";
 import { PlayerListStoreProvider } from "../context/PlayerListStore.js";
 import { CameraReducerProvider } from "../context/CameraReducer.js";
+import { TurnTrackerStoreProvider } from "../context/TurnTrackerStore.js";
 import "../styles/globals.css";
+import 'bootstrap/dist/css/bootstrap.css'
 
 function MyApp({ Component, pageProps }) {
   return (
+    <TurnTrackerStoreProvider>
     <CameraReducerProvider>
       <SocketStoreProvider>
         <PlayerListStoreProvider>
@@ -36,6 +39,7 @@ function MyApp({ Component, pageProps }) {
         </PlayerListStoreProvider>
       </SocketStoreProvider>
     </CameraReducerProvider>
+    </TurnTrackerStoreProvider>
   );
 }
 export default MyApp;

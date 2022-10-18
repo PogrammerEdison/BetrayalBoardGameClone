@@ -3,57 +3,84 @@ import { PlayerDetailsStore } from "../../context/PlayerStore.js";
 import { CardStackStore } from "../../context/CardStore.js";
 import { useEventCardStore } from "../../context/EventCardStore.js";
 import { SocketStore } from "../../context/SocketStore.js";
-
+import { PlayerListStore } from "../../context/PlayerListStore";
+import { TurnTrackerStore } from "../../context/TurnTrackerStore.js";
+import { useState } from "react";
 ///////////
 import { useEffect } from "react";
 import io from "socket.io-client";
 
-const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
-// const socket = io.connect("http://localhost:3001", {
-//   reconnection: true,
-//   reconnectionDelay: 1000,
-//   reconnectionDelayMax: 5000,
-//   reconnectionAttempts: Infinity,
-//   forceNewConnection: false
-// });
+// const socket = io.connect("https://pure-atoll-20271.herokuapp.com/");
 
 ////////////
 
 function BoardCell(props) {
-
-  const [playerOne, playerTwo] = PlayerDetailsStore();
+  const [Socket, setSocket] = SocketStore();
+  const [
+    playerOneImage,
+    setPlayerOneImage,
+    playerOne,
+    setPlayerOne,
+    playerTwo,
+    setPlayerTwo,
+    playerThree,
+    setPlayerThree,
+    playerFour,
+    setPlayerFour,
+    clientName,
+    setClientName,
+    clientPlayer,
+    setClientPlayer,
+  ] = PlayerDetailsStore();
   const [cardStack, setCardStack] = CardStackStore();
   const [eventCard, showEventCard] = useEventCardStore();
+  const [playerList, setPlayerList] = PlayerListStore();
+  const players = [playerOne, playerTwo, playerThree, playerFour];
+  const playerSetting = [setPlayerOne, setPlayerTwo, setPlayerThree, setPlayerFour];
 
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setCardStack(cardStack.slice(1));
-      document.getElementById(parseInt(data.cellId)).src = data.image;
-      console.log(cardStack);
-      console.log(data.message);
-      console.log(data.cellId);
-      console.log(document.getElementById(data.cellId));
-    });
-  }, [socket, cardStack]);
-
+  const [
+    currentTurn,
+    setCurrentTurn,
+    isTurn,
+    setIsTurn,
+    turnCounter,
+    setTurnCounter,
+  ] = TurnTrackerStore();
   ////////////////
   function boardChange() {
+    setTurnCounter(turnCounter + 1);
+    setCurrentTurn(playerList[turnCounter % playerList.length][0]);
+    console.log(";) " + currentTurn);
     console.log("emmiting");
-    socket.emit("send_message", {
+    Socket.emit("send_message", {
       message: "HelloYOYOYOYO",
       cellId: String(props.id),
       image: cardStack[0].image,
     });
   }
   ///////////////////////
-  function testFunction() {
-    alert("Clicked Square");
-    event.target.style.backgroundColor = "powderblue";
+  useEffect(() => {
+    document.getElementById("turn").innerHTML =
+      "It is currently " + currentTurn + "'s turn";
+  }, [currentTurn]);
+
+  function statSetter(index, value){
+    console.log("setting")
+    clientPlayer[index] = value;
+    console.log(clientPlayer);
+  }
+
+  function playerFinder() {
+    for (var i = 0; i < 4; i++) {
+      if (players[i][5] == clientName) {
+        return players[i];
+      }
+    }
   }
 
   function testFunction2(props) {
     console.log("the card stack is " + cardStack[0].name);
-    playerOne.Space = props.id;
+    statSetter(3, props.id)
     props.setActiveCell(props.id);
     props.setActiveCellImage(cardStack[0].image);
     props.setActiveCellName(cardStack[0].name);
@@ -65,7 +92,8 @@ function BoardCell(props) {
     let playedCard = cardStack.slice(0, 1);
     console.log(playedCard);
     switch (playedCard[0].type) {
-      case "cardEvent3":
+      case "cardEvent":
+        let playerSet = playerFinder();
         showEventCard({
           type: "cardEvent",
           payload: {
@@ -74,10 +102,12 @@ function BoardCell(props) {
             penalty: cardStack[0].penalty,
             button: cardStack[0].button,
             value: cardStack[0].value,
+            player: clientPlayer,
+            setPlayer: playerSet,
           },
         });
         break;
-      case "drawEvent3":
+      case "drawEvent":
         showEventCard({
           type: "drawEvent",
           payload: {
@@ -86,7 +116,6 @@ function BoardCell(props) {
         });
         break;
       case "busStation":
-        console.log("poggers");
         showEventCard({
           type: "busStation",
           payload: {
@@ -104,60 +133,67 @@ function BoardCell(props) {
     setCardStack(cardStack.slice(1));
     boardChange();
   }
+  {console.log(clientName == currentTurn)}
 
-  if (props.surround.includes(props.id)) {
+  if (props.surround.includes(props.id) && clientName == currentTurn) {
+    console.log("we are through!");
+    console.log(props.canBePlaced);
+    console.log(props.id);
     const index = props.surround.indexOf(props.id);
     const canBePlaced = props.canBePlaced[index];
     const style = canBePlaced ? "1px solid red" : null;
-    return (
-      <td
-        style={{
-          outline: style,
-          padding: "0px",
-          margin: "0px",
-          objectFit: "cover",
-        }}
-      >
-        <div
-          className="square"
+    if (style != null) {
+      return (
+        <td
           style={{
-            position: " relative",
-            width: "100%",
-            height: "100%",
+            outline: style,
+            padding: "0px",
+            margin: "0px",
             objectFit: "cover",
-          }}
-          onClick={() => {
-            testFunction2(props);
+            lineHeight: "0",
           }}
         >
-          <img
-            src="https://i.imgur.com/wrrKYfO.png"
-            id={props.id}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          ></img>
           <div
-            id={props.id + "player"}
+            className="square"
             style={{
-              position: "absolute",
-              width: "10%",
-              height: "10%",
-              left: "50%",
-              top: "50%",
+              position: " relative",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
             }}
-          ></div>
-        </div>
-      </td>
-    );
+            onClick={() => {
+              testFunction2(props);
+            }}
+          >
+            <img
+              src="https://i.imgur.com/wrrKYfO.png"
+              id={props.id}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            ></img>
+            <div
+              id={props.id + "player"}
+              style={{
+                position: "absolute",
+                width: "10%",
+                height: "10%",
+                left: "50%",
+                top: "50%",
+              }}
+            ></div>
+          </div>
+        </td>
+      );
+    }
   }
 
   if (props.id == 60) {
     return (
-      <td className={classes.td} style={{ padding: "0px", margin: "0px" }}>
+      <td
+        className={classes.td}
+        style={{ padding: "0px", margin: "0px", lineHeight: "0" }}
+      >
         <div
           className="square"
-          onClick={() => {
-            testFunction();
-          }}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         >
           <img

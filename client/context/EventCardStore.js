@@ -17,6 +17,8 @@ const reducer = (state, action) => {
           penalty={action.payload.penalty}
           image={action.payload.image}
           button={action.payload.button}
+          player={action.payload.player}
+          setPlayer={action.payload.setPlayer}
         ></EventCard>
       );
     }

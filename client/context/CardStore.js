@@ -4,25 +4,15 @@ import { useState, createContext, useContext } from "react";
 const cards = [
   {
     name: "Roundabout",
-    image: "https://i.imgur.com/LHHaiwt.png",
+    image: "/roundabout.png",
     type: "normal",
-  },
-  {
-    name: "Spongebob",
-    image: "https://i.imgur.com/3pvcxnC.png",
-    type: "normal",
-  },
-  {
-    name: "Dungannon Leisure Centre",
-    image: "https://i.imgur.com/wKSvBwc.png",
-    type: "drawEvent2",
   },
   {
     name: "Drumglass",
-    image: "https://i.imgur.com/btLWFMa.png",
+    image: "/drumglass.png",
     type: "cardEvent",
     button: "NormalRoll",
-    rollType: "intelligence",
+    rollType: "1",
     value: 0,
     penalty: -2
   },
